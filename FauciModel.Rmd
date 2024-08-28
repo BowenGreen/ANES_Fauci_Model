@@ -1,0 +1,144 @@
+```{r}
+rm(list=ls())
+library(rio)
+library(mice)
+library(jtools)
+library(tidyverse)
+library(broom)
+library(dplyr)
+library(ggplot2)
+library(estimatr)
+library(car)
+library(plm)
+```
+
+```{r}
+gs <- import("ANES2020coded-2.csv")
+```
+
+```{r}
+gs= gs%>% 
+  drop_na(FauciFT, partyID,voteJoe , famincomek , age , sex , race , education , hydroxychloroquinesafe, covidlabgrown) %>% 
+  mutate(
+    facebook = ifelse (facebooker==1, 1, 0),
+    hydrosafe = ifelse(hydroxychloroquinesafe==1, 1, 0),
+    votejoe = ifelse(voteJoe==1, 1, 0),
+    
+    Education = relevel(
+      as.factor(
+        case_when(
+      education == 0 ~ NA_character_,
+      education == 1 ~ 'lessthanHS', 
+      education == 2 ~ 'HS', 
+      education == 3 ~ 'morethanHS', 
+      education == 4 ~ 'Bachelors', 
+      education == 5 ~ 'Graduate', 
+    )
+  )
+  , ref= "lessthanHS"))
+  
+
+```
+
+```{r}
+gs$race <- factor(gs$race, ordered = FALSE)
+gs$race <- relevel(gs$race, ref = "White")
+```
+
+```{r}
+gs$libcondirection = ifelse(gs$libcon > 3.5, "Conservative", "Liberal")
+table(gs$libcondirection)
+```
+```{r}
+gs$nationecon = ifelse(gs$nationecon > 2.5, "Econgood", "Econbad")
+table(gs$nationecon)
+```
+
+```{r}
+gs$partyIDdirection = ifelse(gs$partyID > 3.5, "Republican", "Democrat")
+table(gs$partyIDdirection)
+```
+
+```{r}
+gs$asstblkdirection  = ifelse(gs$dontasstblk > 3.5, "DontHelp", "Help")
+table(gs$asstblkdirection)
+```
+
+```{r}
+gs$religimpdirection  = ifelse(gs$religimp > 2.5, "Not important", "Important")
+table(gs$religimpdirection)
+```
+
+```{r}
+recodedvar <- function(x) {return(as.integer((x + 3) * 1))}
+new_populist <- recodedvar(gs$populist)
+print(new_populist)
+```
+
+```{r}
+table(gs$covidlabgrown)
+```
+
+```{r}
+gs$votetrump<-as.numeric(!gs$votejoe)
+```
+
+```{r}
+model1 <- lm(FauciFT ~ partyIDdirection + votejoe + famincomek + age + sex + race + Education + hydrosafe + covidlabgrown, data=gs)
+summary(model1)
+
+```
+```{r}
+plot(model1)
+```
+
+```{r}
+means <- coef(model1)
+variances <- diag(vcov(model1))
+```
+
+```{r}
+reduced_model <- lm(FauciFT ~ famincomek + age + sex + race + Education + hydrosafe + covidlabgrown, data=gs)
+reduced_anova <- anova(reduced_model, model1)
+print(reduced_anova)
+```
+```{r}
+bartlett1 <- bartlett.test(FauciFT ~ interaction (race,partyIDdirection), data = gs)
+print(bartlett1)
+```
+
+```{r}
+model1residuals <- residuals(model1)
+
+data <- data.frame(model1residuals, gs$partyIDdirection, gs$votejoe, gs$famincomek, gs$age, gs$sex, gs$race, gs$Education, gs$hydrosafe, gs$covidlabgrown)
+```
+```{r}
+fligner.test(FauciFT ~ partyIDdirection, , data = gs)
+```
+```{r}
+leveneTest(model1residuals ~ partyIDdirection, data=gs)
+```
+```{r}
+leveneTest(model1residuals ~ votejoe, data = gs)
+leveneTest(model1residuals ~ famincomek, data = gs)
+```
+
+```{r}
+ggplot(gs, aes(x=FauciFT, y=voteJoe)) +
+    geom_point() +
+    ggtitle("Relationship between FauciFT and voting for Joe Biden in 2020") +
+     xlab("Fauci Feeling Thermometer Score") + ylab("Vote for Joe Biden in 2020") + 
+    geom_smooth(method=lm)
+```
+```{r}
+Model2 <- lm(FauciFT ~  partyIDdirection + votejoe  , data = gs)
+summary(Model2)
+```
+```{r}
+model3 <- TukeyHSD(aov(FauciFT ~ partyIDdirection + votejoe + famincomek + age + sex + race + Education + hydrosafe + covidlabgrown, data =gs), confi.level = 0.95)
+summary(model3)
+```
+
+```{r}
+tukey <- TukeyHSD(model3, conf.level = 0.95)
+```
