@@ -7,10 +7,10 @@ How to engage:
 
 There are four main files:
 
-The data: ANES2020coded.csv \
-The codebook: ANESCodebook2022.xlsx \
-The primary Rmd file: FauciModel.Rmd \
-A short analysis: Fauci_Model_Analysis.pdf
+1. The data file: ANES2020coded.csv \
+2. The data codebook: ANESCodebook2022.xlsx \
+3. The primary Rmd file: FauciModel.Rmd \
+4. A short analysis: Fauci_Model_Analysis.pdf
 
 Additional notes on the ANES 2020 data:
 
