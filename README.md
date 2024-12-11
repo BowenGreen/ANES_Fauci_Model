@@ -1,7 +1,7 @@
 # ANES (2020) Fauci Model
 
 Overview:
-This is a model explaining affect toward Anthony Fauci, i.e., his ratings on the “feeling thermometer” (FauciFT) before and after the 2020 Presidential election, using an excerpt from the 2020 American National Election Survey (ANES). The model itself is primarily guided by my theoretical ideas about the relationships between affect toward Fauci, being, partisan identification, ideology, and other variables. There is a small research report attached serving as an analysis of my models findings
+This is a model explaining affect toward Anthony Fauci, i.e., his ratings on the “feeling thermometer” (FauciFT) before and after the 2020 Presidential election, using an excerpt from the 2020 American National Election Survey (ANES). The model itself is primarily guided by my theoretical ideas about the relationships between affect toward Fauci, being, partisan identification, ideology, and other variables. There is a small research report attached serving as an analysis of my models findings.
 
 How to engage:
 
